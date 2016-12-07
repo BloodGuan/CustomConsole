@@ -56,10 +56,9 @@ public class CustomConsoleWindow : EditorWindow
 
         spl = EditorDrawTools.BeginVerticalSplit(spl);
         int controlID = GUIUtility.GetControlID(FocusType.Native);
-        IEnumerator vl = ListViewGUI.ListView(logListView.obj, "CN Box");
-        while (vl.MoveNext())
+        ListViewGUI.ForeachListView(ListViewGUI.ListView(logListView.obj, "CN Box"),
+        (listViewElement) =>
         {
-            ListViewElement listViewElement = new ListViewElement(vl.Current);
             if (current.type == EventType.MouseDown && current.button == 0 && listViewElement.position.Contains(current.mousePosition))
             {
                 if (current.clickCount == 2)
@@ -84,7 +83,7 @@ public class CustomConsoleWindow : EditorWindow
             {
                 Debug.Log("选中第" + logListView.row + "行");
             }
-        }
+        });
         EditorDrawTools.MidVerticalSplit();
         textScroll = GUILayout.BeginScrollView(textScroll);
         for (int i = 0; i < 5; i++)
@@ -120,6 +119,16 @@ public class CustomConsoleWindow : EditorWindow
             }
             object[] args = new object[] { state, style, options };
             return (IEnumerator)method_ListView.Invoke(null, args);
+        }
+        public static void ForeachListView(IEnumerator ie, Action<ListViewElement> foreachAction)
+        {
+            while (ie.MoveNext())
+            {
+                if (foreachAction != null)
+                {
+                    foreachAction(new ListViewElement(ie.Current));
+                }
+            }
         }
     }
 
